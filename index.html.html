@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al-Hikma School - Exam Results</title>
+    <style>
+        /* Main Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h2 {
+            font-size: 1.5em;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .login-container h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #loginForm input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        #loginForm button {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        #loginForm button:hover {
+            background: #2980b9;
+        }
+
+        .results-container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .student-info {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--table-row-even);
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+
+        .student-info h3 {
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .student-info p {
+            margin: 10px 0;
+            color: var(--text-color);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .results-table th {
+            background: var(--table-header);
+            color: white;
+            font-weight: 500;
+        }
+
+        .results-table tr:nth-child(even) {
+            background-color: var(--table-row-even);
+        }
+
+        .results-table tr:hover {
+            background-color: var(--table-row-hover);
+        }
+
+        .summary-box {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .summary-item {
+            background: var(--summary-item-bg);
+            color: var(--summary-text);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .summary-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .summary-item h4 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: var(--summary-text);
+            font-weight: 700;
+        }
+
+        .summary-item .value {
+            font-size: 1.8em;
+            font-weight: bold;
+            font-weight: 800;
+        }
+
+        .grade-A { color: #2ecc71; }
+        .grade-B { color: #f1c40f; }
+        .grade-C { color: #e67e22; }
+        .grade-D { color: #e74c3c; }
+        .grade-F { color: #c0392b; }
+
+        @media (max-width: 768px) {
+            .summary-box {
+                grid-template-columns: 1fr;
+            }
+
+            .results-container {
+                padding: 15px;
+            }
+
+            .results-table th,
+            .results-table td {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+
+        /* Styling for bold text */
+        h1, h2, h3, h4 {
+            font-weight: 700; /* Making headers bolder */
+        }
+
+        .student-info p {
+            font-weight: 600; /* Making student info text bolder */
+        }
+
+        .summary-item h4 {
+            font-weight: 700; /* Making summary headers bolder */
+        }
+
+        .value {
+            font-weight: 800; /* Making values extra bold */
+        }
+
+        /* Ku dar qaybta logooga */
+        .school-logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        
+        /* Ku dar styling-ka luuqadda */
+        .language-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        
+        .language-switch button {
+            padding: 8px 16px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .language-switch button:hover {
+            background: #2980b9;
+        }
+
+        /* Theme Variables */
+        :root[data-theme="light"] {
+            --background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --text-color: #2c3e50;
+            --card-bg: white;
+            --table-header: #2c3e50;
+            --table-row-even: #f8f9fa;
+            --table-row-hover: #f1f4f6;
+            --summary-item-bg: #2c3e50;
+            --summary-text: white;
+        }
+
+        :root[data-theme="dark"] {
+            --background: linear-gradient(135deg, #1a1a1a 0%, #2c3e50 100%);
+            --text-color: #ecf0f1;
+            --card-bg: #2c3e50;
+            --table-header: #34495e;
+            --table-row-even: #2c3e50;
+            --table-row-hover: #34495e;
+            --summary-item-bg: #34495e;
+            --summary-text: #ecf0f1;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text-color);
+        }
+
+        .login-container, .results-container {
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .results-table th {
+            background: var(--table-header);
+        }
+
+        .results-table tr:nth-child(even) {
+            background-color: var(--table-row-even);
+        }
+
+        .results-table tr:hover {
+            background-color: var(--table-row-hover);
+        }
+
+        .summary-item {
+            background: var(--summary-item-bg);
+            color: var(--summary-text);
+        }
+
+        /* Theme Toggle Button */
+        .theme-switch {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .theme-switch button {
+            padding: 8px 16px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-switch button i {
+            font-size: 18px;
+        }
+
+        /* Custom Colors for Summary Boxes */
+        .summary-box {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .summary-item:nth-child(1) {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+
+        .summary-item:nth-child(2) {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .summary-item:nth-child(3) {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+
+        .summary-item {
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .summary-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .summary-item h4 {
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .summary-item .value {
+            color: white;
+            font-size: 1.8em;
+            font-weight: 800;
+        }
+    </style>
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Add Theme Toggle Button -->
+        <div class="theme-switch">
+            <button onclick="toggleTheme()" id="themeButton">
+                <i class="fas fa-moon"></i> Habka Mugdiga
+            </button>
+        </div>
+
+        <!-- Add Language Switch -->
+        <div class="language-switch">
+            <button onclick="toggleLanguage()" id="langButton">English</button>
+        </div>
+
+        <header>
+            <img src="school-logo.png" alt="Al-Hikma School Logo" class="school-logo">
+            <h1>Iskoolka Al-Hikma</h1>
+            <h2>Bogga Natiijooyinka Ardayda</h2>
+        </header>
+
+        <div class="login-container">
+            <h3>Geli Lambarka Aqoonsiga Ardayga</h3>
+            <form id="loginForm">
+                <input type="text" id="studentId" placeholder="Geli ID-ga (***-***)" required>
+                <button type="submit">Arag Natiijooyinka</button>
+            </form>
+        </div>
+
+        <div class="results-container" id="resultsSection">
+            <div class="student-info">
+                <h3>Macluumaadka Ardayga</h3>
+                <p>Magaca: <span id="studentName"></span></p>
+                <p>Lambarka: <span id="displayStudentId"></span></p>
+                <p>Fasalka: <span id="studentClass"></span></p>
+            </div>
+
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Maadada</th>
+                        <th>Dhibcaha</th>
+                        <th>Darajada</th>
+                    </tr>
+                </thead>
+                <tbody id="marksTable">
+                </tbody>
+            </table>
+
+            <div class="summary-box">
+                <div class="summary-item">
+                    <h4>Wadarta Dhibcaha</h4>
+                    <div class="value" id="totalMarks">0</div>
+                </div>
+                <div class="summary-item">
+                    <h4>Celceliska</h4>
+                    <div class="value" id="averageMarks">0</div>
+                </div>
+                <div class="summary-item">
+                    <h4>Darajada Guud</h4>
+                    <div class="value" id="finalGrade">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Student Database Configuration
+        const subjects = ["BIO", "CHEM", "PHY", "MATH", "ENG", "SOM", "TAR", "ARRAB", "HIS", "GEO"];
+        const students = {};
+
+        // Generate 500 students with hidden ID format
+        for (let i = 1; i <= 500; i++) {
+            // Hide the actual format in the code
+            const studentId = `ALH-${String(i).padStart(3, '0')}`;
+            students[studentId] = {
+                name: `${getRandomName()}`,
+                class: `Form ${Math.floor(Math.random() * 4) + 1}`,
+                marks: generateMarks()
+            };
+        }
+
+        // Generate specific student (Fuaad Siciid)
+        const fuaadId = 'ALH-001';  // ID-ga Fuaad
+        students[fuaadId] = {
+            name: 'Fuaad Siciid',
+            class: 'Form 4',
+            marks: {
+                "BIO": 85,
+                "CHEM": 78,
+                "PHY": 82,
+                "MATH": 90,
+                "ENG": 88,
+                "SOM": 95,
+                "TAR": 87,
+                "ARRAB": 92,
+                "HIS": 85,
+                "GEO": 88
+            }
+        };
+
+        // Helper function to generate marks
+        function generateMarks() {
+            const marks = {};
+            subjects.forEach(subject => {
+                marks[subject] = Math.floor(Math.random() * (100 - 30 + 1)) + 30;
+            });
+            return marks;
+        }
+
+        // Helper function to generate random names
+        function getRandomName() {
+            const firstNames = ["Fuaad", "Hassan", "Ali", "Abdi", "Mohamed", "Asha", "Hodan", "Halima", "Fadumo", "Khadija"];
+            const lastNames = ["Siciid", "Mohamud", "Abdirahman", "Omar", "Ismail", "Farah", "Yusuf", "Hassan", "Abdi", "Nur"];
+            return `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`;
+        }
+
+        // Update the grading function
+        function calculateGrade(marks) {
+            if (marks >= 95) return { grade: 'A+', colorClass: 'grade-A' };
+            if (marks >= 85) return { grade: 'A', colorClass: 'grade-A' };
+            if (marks >= 75) return { grade: 'B+', colorClass: 'grade-B' };
+            if (marks >= 65) return { grade: 'C+', colorClass: 'grade-C' };
+            if (marks >= 60) return { grade: 'C', colorClass: 'grade-C' };
+            if (marks >= 55) return { grade: 'C-', colorClass: 'grade-C' };
+            if (marks >= 50) return { grade: 'D+', colorClass: 'grade-D' };
+            if (marks >= 40) return { grade: 'D', colorClass: 'grade-D' };
+            if (marks >= 33) return { grade: 'E', colorClass: 'grade-F' };
+            return { grade: 'F', colorClass: 'grade-F' };
+        }
+
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const studentId = document.getElementById('studentId').value.toUpperCase();
+            const student = students[studentId];
+
+            if (student) {
+                document.getElementById('resultsSection').style.display = 'block';
+                document.getElementById('studentName').textContent = student.name;
+                document.getElementById('displayStudentId').textContent = studentId;
+                document.getElementById('studentClass').textContent = student.class;
+
+                const marksTable = document.getElementById('marksTable');
+                marksTable.innerHTML = '';
+
+                let totalMarks = 0;
+                subjects.forEach(subject => {
+                    const row = marksTable.insertRow();
+                    const marks = student.marks[subject];
+                    const { grade, colorClass } = calculateGrade(marks);
+                    
+                    row.insertCell(0).textContent = subject;
+                    row.insertCell(1).textContent = marks;
+                    const gradeCell = row.insertCell(2);
+                    gradeCell.textContent = grade;
+                    gradeCell.className = colorClass;
+                    
+                    totalMarks += marks;
+                });
+
+                const average = totalMarks / subjects.length;
+                const { grade: finalGrade, colorClass: finalColorClass } = calculateGrade(average);
+
+                document.getElementById('totalMarks').textContent = totalMarks;
+                document.getElementById('averageMarks').textContent = average.toFixed(1);
+                const finalGradeElement = document.getElementById('finalGrade');
+                finalGradeElement.textContent = finalGrade;
+                finalGradeElement.className = `value ${finalColorClass}`;
+            } else {
+                alert('Student ID not found. Please try again.');
+            }
+        });
+
+        // Theme Toggle Function
+        function toggleTheme() {
+            const root = document.documentElement;
+            const themeButton = document.getElementById('themeButton');
+            const currentTheme = root.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                root.setAttribute('data-theme', 'light');
+                themeButton.innerHTML = '<i class="fas fa-moon"></i> Habka Mugdiga';
+            } else {
+                root.setAttribute('data-theme', 'dark');
+                themeButton.innerHTML = '<i class="fas fa-sun"></i> Habka Iftiinka';
+            }
+        }
+
+        // Set initial theme
+        document.documentElement.setAttribute('data-theme', 'light');
+
+        // Improved Language Toggle Function
+        function toggleLanguage() {
+            const langButton = document.getElementById('langButton');
+            const isEnglish = langButton.textContent === 'Soomaali';
+            
+            const translations = {
+                somali: {
+                    title: 'Iskoolka Al-Hikma',
+                    subtitle: 'Bogga Natiijooyinka Ardayda',
+                    loginTitle: 'Geli Lambarka Aqoonsiga Ardayga',
+                    idPlaceholder: 'Geli ID-ga (***-***)',
+                    viewButton: 'Arag Natiijooyinka',
+                    studentInfo: 'Macluumaadka Ardayga',
+                    name: 'Magaca',
+                    id: 'Lambarka',
+                    class: 'Fasalka',
+                    subject: 'Maadada',
+                    marks: 'Dhibcaha',
+                    grade: 'Darajada',
+                    totalMarks: 'Wadarta Dhibcaha',
+                    average: 'Celceliska',
+                    finalGrade: 'Darajada Guud',
+                    darkMode: 'Habka Mugdiga',
+                    lightMode: 'Habka Iftiinka'
+                },
+                english: {
+                    title: 'Al-Hikma School',
+                    subtitle: 'Student Results Portal',
+                    loginTitle: 'Enter Student ID',
+                    idPlaceholder: 'Enter ID (***-***)',
+                    viewButton: 'View Results',
+                    studentInfo: 'Student Information',
+                    name: 'Name',
+                    id: 'ID Number',
+                    class: 'Class',
+                    subject: 'Subject',
+                    marks: 'Marks',
+                    grade: 'Grade',
+                    totalMarks: 'Total Marks',
+                    average: 'Average',
+                    finalGrade: 'Final Grade',
+                    darkMode: 'Dark Mode',
+                    lightMode: 'Light Mode'
+                }
+            };
+
+            const currentLang = isEnglish ? 'somali' : 'english';
+            const trans = translations[currentLang];
+
+            // Update all text content
+            document.querySelector('h1').textContent = trans.title;
+            document.querySelector('h2').textContent = trans.subtitle;
+            document.querySelector('.login-container h3').textContent = trans.loginTitle;
+            document.querySelector('#studentId').placeholder = trans.idPlaceholder;
+            document.querySelector('#loginForm button').textContent = trans.viewButton;
+            document.querySelector('.student-info h3').textContent = trans.studentInfo;
+
+            // Update table headers
+            const tableHeaders = document.querySelectorAll('.results-table th');
+            tableHeaders[0].textContent = trans.subject;
+            tableHeaders[1].textContent = trans.marks;
+            tableHeaders[2].textContent = trans.grade;
+
+            // Update student info labels
+            const studentInfoLabels = document.querySelectorAll('.student-info p');
+            studentInfoLabels[0].firstChild.textContent = trans.name + ': ';
+            studentInfoLabels[1].firstChild.textContent = trans.id + ': ';
+            studentInfoLabels[2].firstChild.textContent = trans.class + ': ';
+
+            // Update summary boxes
+            document.querySelector('.summary-box .summary-item:nth-child(1) h4').textContent = trans.totalMarks;
+            document.querySelector('.summary-box .summary-item:nth-child(2) h4').textContent = trans.average;
+            document.querySelector('.summary-box .summary-item:nth-child(3) h4').textContent = trans.finalGrade;
+
+            // Update theme button text
+            const themeButton = document.getElementById('themeButton');
+            if (document.documentElement.getAttribute('data-theme') === 'dark') {
+                themeButton.innerHTML = `<i class="fas fa-sun"></i> ${trans.lightMode}`;
+            } else {
+                themeButton.innerHTML = `<i class="fas fa-moon"></i> ${trans.darkMode}`;
+            }
+
+            // Update language button
+            langButton.textContent = isEnglish ? 'English' : 'Soomaali';
+        }
+    </script>
+</body>
+</html>
